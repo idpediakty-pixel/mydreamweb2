@@ -3,19 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IDpedia - Smart ID Management</title>
+    <title>IDpedia - Smart Data Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .bg-animated {
-            background: linear-gradient(-45deg, #0f172a, #1e293b, #0f766e, #0369a1);
+        body { font-family: 'Poppins', sans-serif; }
+        
+        /* Premium Animated Background */
+        .bg-premium {
+            background: linear-gradient(-45deg, #020617, #0f172a, #064e3b, #0c4a6e);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
         }
@@ -24,288 +21,491 @@
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-        .hidden { display: none !important; }
+
+        /* Glassmorphism Card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .tab-active {
+            border-bottom: 3px solid #0d9488;
+            color: #0d9488;
+            font-weight: 600;
+        }
+        .tab-inactive {
+            color: #64748b;
+            font-weight: 500;
+        }
+        
+        /* Hide element utility */
+        .hidden-el { display: none !important; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 antialiased h-screen overflow-hidden">
+<body class="bg-gray-50 text-gray-800 antialiased h-screen overflow-hidden selection:bg-teal-200 selection:text-teal-900">
 
-    <div id="login-container" class="bg-animated h-screen w-full flex flex-col justify-between absolute inset-0 z-50">
-        <div class="flex-grow flex items-center justify-center p-4">
-            
-            <div id="role-selection" class="glass-panel p-10 rounded-2xl shadow-2xl text-center max-w-md w-full transform transition-all">
-                <h1 class="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-500 mb-2">IDpedia</h1>
-                <p class="text-gray-500 mb-10 font-medium">Smart Data Management System</p>
-                
-                <div class="space-y-4">
-                    <button onclick="toggleLogin('official')" class="w-full group relative flex items-center justify-center gap-3 bg-white text-gray-800 border-2 border-gray-100 hover:border-blue-500 font-semibold py-4 px-6 rounded-xl shadow-sm hover:shadow-md transition-all">
-                        <i class="fas fa-user-shield text-blue-500 text-xl group-hover:scale-110 transition-transform"></i> Official Sign In
-                    </button>
-                    <button onclick="toggleLogin('org')" class="w-full group relative flex items-center justify-center gap-3 bg-white text-gray-800 border-2 border-gray-100 hover:border-teal-500 font-semibold py-4 px-6 rounded-xl shadow-sm hover:shadow-md transition-all">
-                        <i class="fas fa-building text-teal-500 text-xl group-hover:scale-110 transition-transform"></i> Organization Sign In
-                    </button>
-                </div>
+    <!-- ================= LOGIN PAGE ================= -->
+    <div id="login-page" class="bg-premium h-screen w-full flex items-center justify-center p-4 relative z-50">
+        
+        <div class="glass-card rounded-2xl w-full max-w-md overflow-hidden transform transition-all duration-300">
+            <!-- Logo Section -->
+            <div class="bg-white/50 p-8 text-center border-b border-gray-100">
+                <h1 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-blue-600 mb-2">IDpedia</h1>
+                <p class="text-gray-500 text-sm font-medium">Smart Data Management System</p>
             </div>
 
-            <div id="login-form" class="glass-panel p-10 rounded-2xl shadow-2xl w-full max-w-md hidden">
-                <button onclick="toggleLogin('back')" class="text-gray-400 hover:text-gray-800 mb-6"><i class="fas fa-arrow-left"></i> Back</button>
-                <div class="text-center mb-8">
-                    <h2 id="login-title" class="text-3xl font-bold text-gray-800">Login</h2>
+            <!-- Login Tabs -->
+            <div class="flex border-b border-gray-200">
+                <button onclick="switchTab('official')" id="tab-official" class="flex-1 py-4 text-center tab-active transition-colors">
+                    <i class="fas fa-user-shield mr-2"></i> Official
+                </button>
+                <button onclick="switchTab('org')" id="tab-org" class="flex-1 py-4 text-center tab-inactive transition-colors hover:text-teal-600">
+                    <i class="fas fa-building mr-2"></i> Organization
+                </button>
+            </div>
+
+            <!-- Login Form -->
+            <div class="p-8">
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="mb-5">
+                        <label class="block text-sm font-semibold text-gray-600 mb-2">User ID</label>
+                        <div class="relative">
+                            <i class="fas fa-user absolute left-4 top-3.5 text-gray-400"></i>
+                            <input type="text" id="username" required placeholder="Enter your ID" class="w-full pl-10 pr-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <label class="block text-sm font-semibold text-gray-600 mb-2">Password</label>
+                        <div class="relative">
+                            <i class="fas fa-lock absolute left-4 top-3.5 text-gray-400"></i>
+                            <input type="password" id="password" required placeholder="Enter password" class="w-full pl-10 pr-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-gradient-to-r from-teal-500 to-blue-600 text-white font-bold py-3.5 rounded-xl hover:shadow-lg hover:opacity-95 transition-all flex justify-center items-center gap-2">
+                        <span>Secure Login</span> <i class="fas fa-arrow-right"></i>
+                    </button>
+                </form>
+                
+                <div id="login-error" class="hidden-el mt-4 p-3 bg-red-50 text-red-500 text-sm text-center rounded-lg border border-red-100 font-medium">
+                    <i class="fas fa-exclamation-circle mr-1"></i> Invalid User ID or Password
                 </div>
-                <input type="text" id="username" placeholder="User ID" class="w-full mb-4 px-5 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 bg-gray-50/50">
-                <input type="password" id="password" placeholder="Password" class="w-full mb-6 px-5 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 bg-gray-50/50">
-                <button onclick="processLogin()" class="w-full bg-gradient-to-r from-teal-500 to-blue-600 text-white font-bold py-3 rounded-xl hover:opacity-90 transition shadow-lg">Login to Dashboard</button>
             </div>
         </div>
-
-        <footer class="text-center py-6 text-gray-300 backdrop-blur-sm bg-black/20">
-            <h3 class="font-bold text-white mb-1">IDpedia Database System</h3>
-            <p class="text-sm">Kuttiadi | Perambra | Vatakara</p>
-            <p class="text-sm mt-1"><i class="fas fa-envelope mr-1"></i> idpediakty@gmail.com | <i class="fas fa-phone mr-1"></i> +91 9895908334</p>
-        </footer>
+        
+        <!-- Footer Info -->
+        <div class="absolute bottom-6 text-center w-full text-white/60 text-xs">
+            <p>IDpedia © 2024 | Kuttiadi, Perambra, Vatakara</p>
+            <p class="mt-1">Support: +91 9895908334</p>
+        </div>
     </div>
 
-    <div id="dashboard" class="hidden h-screen flex bg-gray-50">
-        <aside class="w-72 bg-white border-r border-gray-200 flex flex-col shadow-sm">
-            <div class="p-6 border-b border-gray-100">
-                <h2 class="text-3xl font-extrabold text-teal-600 tracking-tight">IDpedia</h2>
-                <p id="org-name-display" class="text-sm text-gray-500 mt-1 font-medium">Govt. HSS School</p>
+
+    <!-- ================= DASHBOARD PAGE ================= -->
+    <div id="dashboard-page" class="hidden-el h-screen flex bg-slate-50">
+        
+        <!-- Sidebar -->
+        <aside class="w-72 bg-white border-r border-gray-200 flex flex-col shadow-sm hidden md:flex">
+            <div class="p-6 border-b border-gray-100 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-teal-500 text-white flex items-center justify-center font-bold text-xl shadow-inner">ID</div>
+                <div>
+                    <h2 class="text-xl font-bold text-gray-800 tracking-tight leading-tight">IDpedia</h2>
+                    <span id="role-badge" class="text-[10px] font-bold px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full uppercase tracking-wider">Admin</span>
+                </div>
             </div>
-            <nav class="flex-grow p-4 space-y-2 overflow-y-auto">
-                <a href="#" class="flex items-center px-4 py-3 bg-teal-50 text-teal-700 rounded-xl font-medium"><i class="fas fa-user-plus w-6"></i> Data Entry</a>
-                <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl font-medium transition"><i class="fas fa-table w-6"></i> View Records</a>
-                <a href="#" id="export-btn" class="flex items-center px-4 py-3 text-blue-600 hover:bg-blue-50 rounded-xl font-medium transition hidden"><i class="fas fa-file-export w-6"></i> Export Zip Data</a>
+            
+            <nav class="flex-grow p-4 space-y-2 overflow-y-auto mt-2">
+                <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Main Menu</p>
+                <a href="#" class="flex items-center px-4 py-3 bg-teal-50 text-teal-700 rounded-xl font-semibold transition-colors"><i class="fas fa-user-plus w-6"></i> Data Entry</a>
+                <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl font-medium transition-colors"><i class="fas fa-table w-6"></i> Database View</a>
+                
+                <div id="export-menu-item" class="hidden-el">
+                    <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mt-6 mb-2">Administration</p>
+                    <a href="#" class="flex items-center px-4 py-3 text-blue-600 hover:bg-blue-50 border border-transparent hover:border-blue-100 rounded-xl font-medium transition-colors"><i class="fas fa-file-archive w-6"></i> Export to ZIP</a>
+                </div>
             </nav>
+            
             <div class="p-4 border-t border-gray-100">
-                <button onclick="logout()" class="w-full flex items-center justify-center gap-2 bg-red-50 text-red-600 hover:bg-red-100 px-4 py-3 rounded-xl font-semibold transition">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+                <div class="flex items-center gap-3 px-4 py-3 mb-2">
+                    <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600"><i class="fas fa-user"></i></div>
+                    <div class="text-sm font-semibold text-gray-700 truncate" id="org-name-display">Govt HSS</div>
+                </div>
+                <button onclick="logout()" class="w-full flex items-center justify-center gap-2 bg-red-50 text-red-600 hover:bg-red-500 hover:text-white px-4 py-3 rounded-xl font-semibold transition-all duration-300">
+                    <i class="fas fa-power-off"></i> Sign Out
                 </button>
             </div>
         </aside>
 
-        <main class="flex-grow flex flex-col overflow-hidden">
-            <header class="bg-white border-b border-gray-200 px-8 py-5 flex justify-between items-center z-10">
-                <h1 class="text-2xl font-bold text-gray-800">Data Entry Management</h1>
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-teal-100 text-teal-700 rounded-full flex items-center justify-center font-bold">A</div>
-                </div>
+        <!-- Main Content -->
+        <main class="flex-grow flex flex-col overflow-hidden relative">
+            
+            <!-- Mobile Header -->
+            <header class="md:hidden bg-white border-b border-gray-200 p-4 flex justify-between items-center shadow-sm z-10">
+                <h1 class="font-bold text-teal-600 text-lg">IDpedia</h1>
+                <button onclick="logout()" class="text-red-500 text-sm font-semibold bg-red-50 px-3 py-1.5 rounded-lg"><i class="fas fa-sign-out-alt"></i></button>
             </header>
 
-            <div class="flex-grow overflow-y-auto p-8 scroll-smooth">
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 mb-8">
-                    <h3 class="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2"><i class="fas fa-edit text-teal-500"></i> Register New Member</h3>
-                    <form id="dataForm" class="space-y-6" onsubmit="saveData(event)">
-                        <input type="hidden" id="record-id"> <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="flex-grow overflow-y-auto p-4 md:p-8 scroll-smooth pb-20">
+                
+                <!-- Registration Form -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 mb-8">
+                    <div class="flex items-center gap-3 mb-6 border-b border-gray-100 pb-4">
+                        <div class="w-10 h-10 rounded-lg bg-teal-50 flex items-center justify-center text-teal-600"><i class="fas fa-address-card text-xl"></i></div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800">New Registration</h3>
+                            <p class="text-sm text-gray-500">Fill details to generate ID profile</p>
+                        </div>
+                    </div>
+                    
+                    <form id="dataForm" onsubmit="saveData(event)">
+                        
+                        <!-- Inputs Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-6">
                             <div>
-                                <label class="block text-sm font-semibold text-gray-600 mb-2">Full Name</label>
-                                <input type="text" id="name" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 transition">
+                                <label class="block text-sm font-semibold text-gray-600 mb-1.5">Full Name</label>
+                                <input type="text" id="name" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition-all">
                             </div>
                             <div>
-                                <label class="block text-sm font-semibold text-gray-600 mb-2">Admn No / Roll No</label>
-                                <input type="text" id="admnNo" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 transition">
+                                <label class="block text-sm font-semibold text-gray-600 mb-1.5">Admn No / Roll No</label>
+                                <input type="text" id="admnNo" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition-all">
                             </div>
                             <div>
-                                <label class="block text-sm font-semibold text-gray-600 mb-2">Class / Dept</label>
-                                <input type="text" id="classDept" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 transition">
+                                <label class="block text-sm font-semibold text-gray-600 mb-1.5">Class / Dept</label>
+                                <input type="text" id="classDept" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-600 mb-1.5">Guardian's Name</label>
+                                <input type="text" id="guardian" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-600 mb-1.5">Mobile Number</label>
+                                <input type="tel" id="mobile" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-600 mb-1.5">House Name</label>
+                                <input type="text" id="house" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-600 mb-1.5">Place</label>
+                                <input type="text" id="place" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition-all">
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-600 mb-2">Guardian's Name</label>
-                                <input type="text" id="guardian" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 transition">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-600 mb-2">Mobile Number</label>
-                                <input type="tel" id="mobile" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 transition">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-600 mb-2">House Name (വീട്ടുപേര്)</label>
-                                <input type="text" id="house" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 transition">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-600 mb-2">Place (സ്ഥലം)</label>
-                                <input type="text" id="place" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 transition">
-                            </div>
-                        </div>
-
-                        <div class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-2xl p-6">
-                            <label class="block text-sm font-semibold text-gray-700 mb-4 text-center">Capture or Upload Photo</label>
+                        <!-- Photo Section -->
+                        <div class="bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl p-6 mb-6">
+                            <h4 class="text-sm font-bold text-gray-700 mb-4 text-center">Capture or Upload Photograph</h4>
                             
                             <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
-                                <label class="flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 px-6 py-3 rounded-xl cursor-pointer hover:bg-gray-100 shadow-sm transition w-full sm:w-auto">
-                                    <i class="far fa-folder-open text-blue-500"></i> Browse Files
-                                    <input type="file" id="photo-upload" accept="image/*" class="hidden" onchange="previewPhoto(this)">
+                                <label class="flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 px-6 py-2.5 rounded-lg cursor-pointer hover:bg-gray-50 hover:border-teal-500 transition-all shadow-sm w-full sm:w-auto font-medium">
+                                    <i class="far fa-image text-blue-500 text-lg"></i> Browse Gallery
+                                    <input type="file" id="photo-upload" accept="image/*" class="hidden" onchange="handleFileUpload(this)">
                                 </label>
                                 
-                                <button type="button" onclick="startCamera()" class="flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 px-6 py-3 rounded-xl hover:bg-gray-100 shadow-sm transition w-full sm:w-auto">
-                                    <i class="fas fa-camera text-teal-500"></i> Open Camera
+                                <button type="button" onclick="startCamera()" class="flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 px-6 py-2.5 rounded-lg hover:bg-gray-50 hover:border-teal-500 transition-all shadow-sm w-full sm:w-auto font-medium">
+                                    <i class="fas fa-camera text-teal-600 text-lg"></i> Open Camera
                                 </button>
                             </div>
 
-                            <div id="camera-container" class="hidden mt-4 flex flex-col items-center">
-                                <video id="videoElement" autoplay class="rounded-xl w-64 h-64 object-cover border border-gray-300 mb-3"></video>
-                                <button type="button" onclick="capturePhoto()" class="bg-teal-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-teal-600">Snap Photo</button>
+                            <!-- Camera View -->
+                            <div id="camera-container" class="hidden-el mt-6 flex flex-col items-center">
+                                <div class="relative w-48 h-48 rounded-lg overflow-hidden border-2 border-teal-500 shadow-md mb-3 bg-black">
+                                    <video id="videoElement" autoplay class="absolute inset-0 w-full h-full object-cover"></video>
+                                </div>
+                                <button type="button" onclick="capturePhoto()" class="bg-teal-600 text-white px-8 py-2 rounded-full font-bold hover:bg-teal-700 shadow-lg transform transition hover:scale-105">
+                                    <i class="fas fa-camera-retro mr-2"></i> Snap Photo
+                                </button>
                             </div>
 
-                            <div class="mt-4 flex justify-center">
-                                <img id="photo-preview" class="hidden w-32 h-32 object-cover rounded-xl border-4 border-white shadow-md">
+                            <!-- Final Image Preview -->
+                            <div id="preview-container" class="hidden-el mt-6 flex flex-col items-center">
+                                <p class="text-xs text-green-600 font-bold mb-2 uppercase tracking-wide"><i class="fas fa-check-circle"></i> Photo Selected</p>
+                                <img id="photo-preview" class="w-32 h-32 object-cover rounded-xl border-4 border-white shadow-lg">
+                                <button type="button" onclick="clearPhoto()" class="text-xs text-red-500 mt-3 font-semibold hover:underline">Remove Photo</button>
                             </div>
                         </div>
 
-                        <button type="submit" class="w-full bg-gray-900 text-white font-bold py-4 rounded-xl hover:bg-black transition shadow-lg">Save Record</button>
+                        <!-- Action Button -->
+                        <button type="submit" id="saveBtn" class="w-full md:w-auto md:min-w-[200px] bg-slate-900 text-white font-bold py-3.5 px-8 rounded-xl hover:bg-slate-800 transition-colors shadow-lg flex justify-center items-center gap-2">
+                            <i class="fas fa-save"></i> <span>Save Record</span>
+                        </button>
                     </form>
                 </div>
 
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div class="p-6 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-                        <h3 class="text-lg font-bold text-gray-800">Saved Records</h3>
-                        <span class="bg-teal-100 text-teal-800 text-xs font-bold px-3 py-1 rounded-full">Live Database</span>
+                <!-- Live Data Table -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-5 border-b border-gray-100 bg-gray-50/80 flex justify-between items-center">
+                        <h3 class="text-lg font-bold text-gray-800"><i class="fas fa-database text-teal-500 mr-2"></i> Saved Records</h3>
+                        <span class="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Live
+                        </span>
                     </div>
+                    
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
+                        <table class="w-full text-left border-collapse min-w-[600px]">
                             <thead>
-                                <tr class="bg-white text-gray-500 text-sm border-b border-gray-200">
-                                    <th class="p-4 font-semibold">Photo</th>
+                                <tr class="bg-white text-gray-400 text-xs uppercase tracking-wider border-b border-gray-100">
+                                    <th class="p-4 font-semibold w-16">Profile</th>
                                     <th class="p-4 font-semibold">Admn No</th>
-                                    <th class="p-4 font-semibold">Name</th>
-                                    <th class="p-4 font-semibold">Class</th>
-                                    <th class="p-4 font-semibold">Actions</th>
+                                    <th class="p-4 font-semibold">Student Name</th>
+                                    <th class="p-4 font-semibold">Class/Dept</th>
+                                    <th class="p-4 font-semibold text-right">Action</th>
                                 </tr>
                             </thead>
-                            <tbody id="data-table-body" class="text-sm">
-                                <tr>
-                                    <td colspan="5" class="p-8 text-center text-gray-400">No records found. Start adding data.</td>
+                            <tbody id="data-table-body" class="text-sm divide-y divide-gray-50">
+                                <!-- Empty state -->
+                                <tr id="empty-row">
+                                    <td colspan="5" class="p-10 text-center">
+                                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-50 mb-3">
+                                            <i class="fas fa-folder-open text-2xl text-gray-300"></i>
+                                        </div>
+                                        <p class="text-gray-500 font-medium">No records found yet.</p>
+                                        <p class="text-xs text-gray-400 mt-1">Data saved will appear here automatically.</p>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
+
             </div>
         </main>
     </div>
 
+    <!-- ================= JAVASCRIPT LOGIC ================= -->
     <script>
-        let currentRole = '';
+        // 1. പ്രധാന സെറ്റിംഗ്സ്
+        const BACKEND_URL = 'https://mydreamweb2.onrender.com/api/students'; // 
+        let selectedRole = 'official'; 
         let photoDataURI = null;
+        let videoStream = null;
 
-        // Login Logic
-        function toggleLogin(role) {
-            document.getElementById('role-selection').classList.add('hidden');
-            document.getElementById('login-form').classList.remove('hidden');
-            if(role === 'back') {
-                document.getElementById('role-selection').classList.remove('hidden');
-                document.getElementById('login-form').classList.add('hidden');
+        // 2. ലോഗിൻ ടാബ് മാറ്റാൻ
+        function switchTab(role) {
+            selectedRole = role;
+            const tabOfficial = document.getElementById('tab-official');
+            const tabOrg = document.getElementById('tab-org');
+            const errorMsg = document.getElementById('login-error');
+            
+            errorMsg.classList.add('hidden-el'); // എറർ മെസ്സേജ് കളയുക
+
+            if(role === 'official') {
+                tabOfficial.className = "flex-1 py-4 text-center tab-active transition-colors";
+                tabOrg.className = "flex-1 py-4 text-center tab-inactive transition-colors hover:text-teal-600";
             } else {
-                currentRole = role;
-                document.getElementById('login-title').innerText = role === 'official' ? 'Official Portal' : 'Organization Portal';
+                tabOrg.className = "flex-1 py-4 text-center tab-active transition-colors";
+                tabOfficial.className = "flex-1 py-4 text-center tab-inactive transition-colors hover:text-teal-600";
             }
         }
 
-        function processLogin() {
-            // Demo logic - Replace with real API
-            document.getElementById('login-container').classList.add('hidden');
-            document.getElementById('dashboard').classList.remove('hidden');
+        // 3. ലോഗിൻ പരിശോധിക്കാൻ
+        function handleLogin(e) {
+            e.preventDefault(); // പേജ് റീലോഡ് ആകാതിരിക്കാൻ
             
-            if(currentRole === 'official') {
-                document.getElementById('org-name-display').innerText = "Super Admin";
-                document.getElementById('export-btn').classList.remove('hidden');
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value.trim();
+            const errorMsg = document.getElementById('login-error');
+
+            let isSuccess = false;
+            let displayTitle = "";
+            let badgeText = "";
+
+            // പാസ്‌വേഡുകൾ പരിശോധിക്കുന്നു
+            if (selectedRole === 'official') {
+                if (user === 'admin' && pass === '1234') {
+                    isSuccess = true;
+                    displayTitle = "Super Admin Profile";
+                    badgeText = "Official";
+                    document.getElementById('export-menu-item').classList.remove('hidden-el');
+                }
+            } else {
+                if (user === 'school' && pass === '0000') {
+                    isSuccess = true;
+                    displayTitle = "Organization Dashboard";
+                    badgeText = "School";
+                    document.getElementById('export-menu-item').classList.add('hidden-el');
+                }
+            }
+
+            // ലോഗിൻ ശരിയാണെങ്കിൽ ഡാഷ്‌ബോർഡ് കാണിക്കുക
+            if (isSuccess) {
+                errorMsg.classList.add('hidden-el');
+                document.getElementById('login-page').classList.add('hidden-el');
+                document.getElementById('dashboard-page').classList.remove('hidden-el');
+                
+                document.getElementById('org-name-display').innerText = displayTitle;
+                document.getElementById('role-badge').innerText = badgeText;
+            } else {
+                // തെറ്റാണെങ്കിൽ എറർ കാണിക്കുക
+                errorMsg.classList.remove('hidden-el');
             }
         }
 
+        // 4. ലോഗൗട്ട് ചെയ്യാൻ
         function logout() {
-            document.getElementById('dashboard').classList.add('hidden');
-            document.getElementById('login-container').classList.remove('hidden');
-            toggleLogin('back');
+            document.getElementById('dashboard-page').classList.add('hidden-el');
+            document.getElementById('login-page').classList.remove('hidden-el');
+            document.getElementById('loginForm').reset();
+            document.getElementById('login-error').classList.add('hidden-el');
+            stopCamera(); // ക്യാമറ ഓൺ ആണെങ്കിൽ ഓഫ് ആക്കാൻ
         }
 
-        // Camera Logic (navigator.mediaDevices)
-        const video = document.getElementById('videoElement');
-        const cameraContainer = document.getElementById('camera-container');
-        const preview = document.getElementById('photo-preview');
-
+        // 5. ക്യാമറ ഓൺ ചെയ്യാൻ
         async function startCamera() {
+            const camContainer = document.getElementById('camera-container');
+            const prevContainer = document.getElementById('preview-container');
+            const videoEl = document.getElementById('videoElement');
+
             try {
-                cameraContainer.classList.remove('hidden');
-                preview.classList.add('hidden');
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                video.srcObject = stream;
+                // പഴയ ഫോട്ടോ ഉണ്ടെങ്കിൽ കളയുക
+                prevContainer.classList.add('hidden-el');
+                camContainer.classList.remove('hidden-el');
+                
+                videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                videoEl.srcObject = videoStream;
             } catch (err) {
-                alert("Camera access denied or not available. Please ensure HTTPS is enabled.");
+                console.error("Camera Error:", err);
+                alert("ക്യാമറ ഓപ്പൺ ചെയ്യാൻ കഴിഞ്ഞില്ല! (വെബ്സൈറ്റ് HTTPS ആണോ എന്ന് പരിശോധിക്കുക, അല്ലെങ്കിൽ പെർമിഷൻ നൽകുക)");
+                camContainer.classList.add('hidden-el');
             }
         }
 
+        // 6. ഫോട്ടോ ക്യാപ്ചർ ചെയ്യാൻ
         function capturePhoto() {
+            const videoEl = document.getElementById('videoElement');
             const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0);
-            photoDataURI = canvas.toDataURL('image/jpeg');
             
-            // Stop camera
-            video.srcObject.getTracks().forEach(track => track.stop());
-            cameraContainer.classList.add('hidden');
+            // വീഡിയോ സൈസ് അനുസരിച്ച് ഫോട്ടോ എടുക്കുന്നു
+            canvas.width = videoEl.videoWidth || 400;
+            canvas.height = videoEl.videoHeight || 400;
+            canvas.getContext('2d').drawImage(videoEl, 0, 0, canvas.width, canvas.height);
             
-            preview.src = photoDataURI;
-            preview.classList.remove('hidden');
+            photoDataURI = canvas.toDataURL('image/jpeg', 0.8);
+            showPreview();
+            stopCamera();
         }
 
-        // File Upload Preview
-        function previewPhoto(input) {
+        // 7. ഫയൽ അപ്‌ലോഡ് ചെയ്യാൻ (ഗാലറി)
+        function handleFileUpload(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     photoDataURI = e.target.result;
-                    preview.src = photoDataURI;
-                    preview.classList.remove('hidden');
-                    cameraContainer.classList.add('hidden');
+                    showPreview();
+                    stopCamera();
                 }
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
-        // Form Submit
-        function saveData(e) {
-            e.preventDefault();
-            // Data collection
-            const data = {
-                id: document.getElementById('record-id').value || Date.now(), // Generate ID if new
+        // 8. ഫോട്ടോ പ്രിവ്യൂ കാണിക്കാൻ
+        function showPreview() {
+            document.getElementById('camera-container').classList.add('hidden-el');
+            const previewEl = document.getElementById('photo-preview');
+            previewEl.src = photoDataURI;
+            document.getElementById('preview-container').classList.remove('hidden-el');
+        }
+
+        // 9. ക്യാമറ ഓഫ് ആക്കാൻ
+        function stopCamera() {
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                videoStream = null;
+            }
+            document.getElementById('camera-container').classList.add('hidden-el');
+        }
+
+        // 10. ഫോട്ടോ ഒഴിവാക്കാൻ
+        function clearPhoto() {
+            photoDataURI = null;
+            document.getElementById('preview-container').classList.add('hidden-el');
+            document.getElementById('photo-upload').value = ""; // ഇൻപുട്ട് ക്ലിയർ ചെയ്യാൻ
+        }
+
+        // 11. ഡാറ്റ സേവ് ചെയ്യാൻ (Backend Connection)
+        async function saveData(e) {
+            e.preventDefault(); // റീലോഡ് തടയുന്നു
+            
+            const btn = document.getElementById('saveBtn');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> <span>Saving Data...</span>`;
+            btn.disabled = true;
+
+            // ഫോമിലെ ഡാറ്റ കളക്ട് ചെയ്യുന്നു
+            const payload = {
                 admnNo: document.getElementById('admnNo').value,
                 name: document.getElementById('name').value,
                 classDept: document.getElementById('classDept').value,
-                photo: photoDataURI || 'https://via.placeholder.com/50'
+                guardian: document.getElementById('guardian').value,
+                mobile: document.getElementById('mobile').value,
+                house: document.getElementById('house').value,
+                place: document.getElementById('place').value,
+                photo: photoDataURI || '', 
+                orgId: selectedRole === 'official' ? 'admin_01' : 'school_01'
             };
 
-            // In real app: fetch('backend-url', { method: 'POST/PUT', body: formData })
-            console.log("Saving Data:", data);
-            alert("Record Saved Successfully!");
-            document.getElementById('dataForm').reset();
-            preview.classList.add('hidden');
-            photoDataURI = null;
-            document.getElementById('record-id').value = ""; // Clear edit id
-            
-            // Re-render table (Dummy UI update)
-            addDemoRow(data);
+            try {
+                // Render ബാക്കെൻഡിലേക്ക് ഡാറ്റ പോസ്റ്റ് ചെയ്യുന്നു
+                const response = await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    // വിജയിച്ചാൽ
+                    alert("വിവരങ്ങൾ വിജയകരമായി സേവ് ചെയ്തു!");
+                    document.getElementById('dataForm').reset();
+                    clearPhoto();
+                    appendDataToTable(payload);
+                } else {
+                    // ബാക്കെൻഡിൽ നിന്നും എറർ വന്നാൽ
+                    alert("ക്ഷമിക്കണം, ഡാറ്റ സേവ് ചെയ്യുന്നതിൽ പിഴവ് സംഭവിച്ചു!");
+                }
+            } catch (error) {
+                // ഇന്റർനെറ്റ് ഇല്ലെങ്കിൽ അല്ലെങ്കിൽ ലിങ്ക് തെറ്റിയാൽ
+                console.error("Network Error:", error);
+                alert("നെറ്റ്‌വർക്ക് എറർ! Render ലിങ്ക് ശരിയാണോ എന്ന് പരിശോധിക്കുക.");
+                
+                // ടെസ്റ്റിംഗിന് വേണ്ടി മാത്രം ഡാറ്റ ടേബിളിൽ കാണിക്കുന്നു
+                appendDataToTable(payload);
+                document.getElementById('dataForm').reset();
+                clearPhoto();
+            } finally {
+                // ബട്ടൺ പഴയപടി ആക്കുന്നു
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+            }
         }
 
-        function addDemoRow(data) {
+        // 12. ടേബിളിലേക്ക് ഡാറ്റ ചേർക്കാൻ
+        function appendDataToTable(data) {
+            const emptyRow = document.getElementById('empty-row');
+            if(emptyRow) emptyRow.remove(); // Empty മെസ്സേജ് കളയുന്നു
+
             const tbody = document.getElementById('data-table-body');
-            if(tbody.innerText.includes("No records")) tbody.innerHTML = "";
+            const photoSrc = data.photo || 'https://via.placeholder.com/150?text=No+Photo';
             
-            tbody.innerHTML += `
-                <tr class="border-b border-gray-100 hover:bg-gray-50">
-                    <td class="p-4"><img src="${data.photo}" class="w-10 h-10 rounded-full object-cover"></td>
-                    <td class="p-4 font-semibold text-gray-800">${data.admnNo}</td>
-                    <td class="p-4">${data.name}</td>
-                    <td class="p-4">${data.classDept}</td>
-                    <td class="p-4">
-                        <button class="text-blue-500 hover:text-blue-700 mr-3" onclick="alert('Edit Clicked')"><i class="fas fa-edit"></i> Edit</button>
-                    </td>
-                </tr>
+            const tr = document.createElement('tr');
+            tr.className = "hover:bg-slate-50 transition-colors group";
+            tr.innerHTML = `
+                <td class="p-4">
+                    <img src="${photoSrc}" class="w-10 h-10 rounded-lg object-cover border border-gray-200 shadow-sm">
+                </td>
+                <td class="p-4 font-bold text-gray-700">${data.admnNo}</td>
+                <td class="p-4 font-medium text-gray-800">${data.name}</td>
+                <td class="p-4 text-gray-600">${data.classDept}</td>
+                <td class="p-4 text-right">
+                    <button class="text-teal-500 hover:text-teal-700 font-semibold text-sm bg-teal-50 hover:bg-teal-100 px-3 py-1.5 rounded transition-colors opacity-0 group-hover:opacity-100">
+                        Edit <i class="fas fa-pencil-alt text-xs ml-1"></i>
+                    </button>
+                </td>
             `;
+            // ഏറ്റവും പുതിയ ഡാറ്റ മുകളിൽ വരാൻ
+            tbody.insertBefore(tr, tbody.firstChild);
         }
-    </const BACKEND_URL = 'https://your-backend-url.onrender.com/api/students'>
+    </script>
 </body>
 </html>
