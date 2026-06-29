@@ -58,7 +58,7 @@ app.post('/api/students', upload.single('photo'), async (req, res) => {
 
 // പോർട്ട് കണക്ഷൻ
 const PORT = process.env.PORT || 5000;
-mongoose.connect('mongodb+srv://rajeeshparavath_db_user:g9IMlaLTAmsWp6fE@cicada.g9mf7tf.mongodb.net/idpedia', { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect('mongodb+srv://rajeeshparavath_db_user:g9IMlaLTAmsWp6fE@cicada.g9mf7tf.mongodb.net/idpedia')
     .then(() => {
         app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
     });
